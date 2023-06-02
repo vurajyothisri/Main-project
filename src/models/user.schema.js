@@ -2,6 +2,7 @@
 import mongoose from 'mongoose'
 import { object } from 'webidl-conversions'
 import AuthRoles from '../utils/authRoles'
+import bcrypt from "bcryptjs"
 //enum:it will give values as array from the objects but not properties here we call utils/authRoles in thar we have a object with user,admin and so on use object.values(aithroles) it will give tha values of the properties
 const userSchema=new mongoose.Schema({
     name:{
@@ -29,4 +30,23 @@ const userSchema=new mongoose.Schema({
     forgotPasswordExpiry:Date
 
 },{timestamps:true})
+//Encrypt the password before saving
+//pre as two parametres first one the event and second parameter is what to do we dont use arrow function in mongodbhooks
+userSchema.pre("save",async function(next){
+    if(!this.isModified("password")) return next()//don't want to do any this wehn it is not modified
+    this.password=await bcrypt.hash(this.password,10)
+    next()
+})
+
+userSchema.methods={
+    //compare password ex:login it will encrypt password using asame algorithm and match the password in database
+    //enteredpassword is targeting the user enterd password while login
+    comparePassword:async function(enteredPassword){
+        return await bcrypt.compare(enteredPassword,this.password)
+
+    }
+
+}
+
+
 export default  mongoose.model("User",userSchema)
