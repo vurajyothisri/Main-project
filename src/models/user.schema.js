@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import { object } from 'webidl-conversions'
 import AuthRoles from '../utils/authRoles'
 import bcrypt from "bcryptjs"
+import JWT from "jsonwebtoken"
 //enum:it will give values as array from the objects but not properties here we call utils/authRoles in thar we have a object with user,admin and so on use object.values(aithroles) it will give tha values of the properties
 const userSchema=new mongoose.Schema({
     name:{
@@ -44,9 +45,13 @@ userSchema.methods={
     comparePassword:async function(enteredPassword){
         return await bcrypt.compare(enteredPassword,this.password)
 
+    },
+    //generate JWT token
+    getJWTtoken:function(){
+        
     }
-
 }
+
 
 
 export default  mongoose.model("User",userSchema)
